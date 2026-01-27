@@ -1,0 +1,102 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: ${{ matrix.target }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # ---------- Linux ----------
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+            artifact: linux-x86_64
+            bin_ext: ""
+
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-musl
+            artifact: linux-musl-x86_64
+            bin_ext: ""
+
+          - os: ubuntu-latest
+            target: aarch64-unknown-linux-gnu
+            artifact: linux-aarch64
+            bin_ext: ""
+
+          # ---------- Windows ----------
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+            artifact: windows-x86_64
+            bin_ext: ".exe"
+
+          # ---------- macOS ----------
+          - os: macos-latest
+            target: x86_64-apple-darwin
+            artifact: macos-x86_64
+            bin_ext: ""
+
+          - os: macos-latest
+            target: aarch64-apple-darwin
+            artifact: macos-aarch64
+            bin_ext: ""
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      - uses: Swatinem/rust-cache@v2
+
+      # MUSL deps
+      - name: Install musl tools
+        if: matrix.target == 'x86_64-unknown-linux-musl'
+        run: sudo apt-get update && sudo apt-get install -y musl-tools
+
+      # Cross compile deps for ARM Linux
+      - name: Install aarch64 toolchain
+        if: matrix.target == 'aarch64-unknown-linux-gnu'
+        run: sudo apt-get update && sudo apt-get install -y gcc-aarch64-linux-gnu
+
+      - name: Build
+        run: cargo build -p spl-risk --release --target ${{ matrix.target }}
+
+      # ---------- Package (Unix) ----------
+      - name: Package (tar.gz)
+        if: runner.os != 'Windows'
+        shell: bash
+        run: |
+          set -euxo pipefail
+          BIN="spl-risk${{ matrix.bin_ext }}"
+          OUT="spl-risk-${{ github.ref_name }}-${{ matrix.artifact }}"
+          mkdir -p dist
+          cp "target/${{ matrix.target }}/release/${BIN}" "dist/${BIN}"
+          tar -C dist -czf "${OUT}.tar.gz" "${BIN}"
+
+      # ---------- Package (Windows) ----------
+      - name: Package (zip)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $bin = "spl-risk${{ matrix.bin_ext }}"
+          $out = "spl-risk-${{ github.ref_name }}-${{ matrix.artifact }}.zip"
+          New-Item -ItemType Directory -Force dist | Out-Null
+          Copy-Item "target\${{ matrix.target }}\release\$bin" "dist\$bin"
+          Compress-Archive -Path "dist\$bin" -DestinationPath $out -Force
+
+      - name: Upload to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            *.tar.gz
+            *.zip
