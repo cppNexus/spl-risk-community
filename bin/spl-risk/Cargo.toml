@@ -1,0 +1,49 @@
+
+
+[package]
+name = "spl-risk"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.75"
+authors = ["SPL Risk Team"]
+license = "MIT"
+description = "Deterministic risk analyzer for Solana SPL tokens (Community Edition)"
+repository = "https://github.com/yourusername/spl-risk"
+keywords = ["solana", "spl", "security", "blockchain"]
+categories = ["command-line-utilities", "cryptography::cryptocurrencies"]
+
+[[bin]]
+name = "spl-risk"
+path = "src/main.rs"
+
+[dependencies]
+# Workspace crates
+spl-risk-core = { path = "../../crates/spl-risk-core" }
+spl-risk-rpc = { path = "../../crates/spl-risk-rpc" }
+spl-risk-community = { path = "../../crates/spl-risk-community" }
+spl-risk-output = { path = "../../crates/spl-risk-output" }
+
+# Shared deps from workspace
+anyhow = { workspace = true }
+tokio = { workspace = true }
+clap = { workspace = true }
+colored = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+chrono = { workspace = true }
+solana-sdk = { workspace = true }
+
+[features]
+# Community binary only ships community rules
+default = ["community"]
+community = []
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+strip = true
+
+[profile.dev]
+opt-level = 0
+debug = true

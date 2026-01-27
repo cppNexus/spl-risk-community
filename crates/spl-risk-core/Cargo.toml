@@ -1,0 +1,28 @@
+
+
+[package]
+name = "spl-risk-core"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.75"
+license = "MIT"
+description = "Core models and scoring engine for SPL Risk"
+
+[dependencies]
+# Workspace shared deps
+anyhow = { workspace = true }
+thiserror = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+chrono = { workspace = true }
+
+# Solana types (Pubkey)
+solana-sdk = { workspace = true }
+
+# Async trait for provider abstraction
+async-trait = "0.1"
+
+[features]
+default = []
+lp-analysis = []
+pro = []

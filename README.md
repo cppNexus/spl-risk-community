@@ -1,5 +1,14 @@
 # SPL Risk (Community Edition)
 
+[![Rust 1.75+](https://img.shields.io/badge/Rust-1.75%2B-informational)](bin/spl-risk/Cargo.toml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![Edition: Community](https://img.shields.io/badge/Edition-Community-blue)](crates/spl-risk-community/src/heuristics/mod.rs)
+[![Status: As-Is](https://img.shields.io/badge/Status-As--Is-lightgrey)](README.md)
+
+**TL;DR (EN):** Free, deterministic SPL token risk CLI. Community edition is unsigned/unaudited and shipped as-is.
+
+**TL;DR (RU):** Бесплатный детерминированный CLI-анализатор риска SPL-токенов. Community-версия без подписи/аудита и поставляется "как есть".
+
 Free CLI risk analyzer for SPL tokens on Solana. It reads on-chain data via RPC, applies a small set of deterministic heuristics, and returns a risk score plus a human-readable explanation.
 
 Important: this is the free community edition, provided "as is". Releases may be unsigned and unaudited, and come with no guarantees. Use at your own risk and always DYOR.
@@ -79,10 +88,136 @@ Main options:
 - `--no-cache` - disable cache.
 - `--cache-stats` - print cache stats.
 
-JSON example:
+### Free RPC Key (Helius)
+
+You can register with Helius and get a free API key, then pass it via `--rpc-url`.
+
+Example:
 
 ```bash
-spl-risk <MINT_ADDRESS> --json
+spl-risk <MINT_ADDRESS> --rpc-url "https://mainnet.helius-rpc.com/?api-key=YOUR_API_KEY"
+```
+
+### Sample Output (Human)
+
+Note: this is a representative example of the current formatter.
+
+```text
+═══════════════════════════════════════════════════════════
+SPL TOKEN RISK ANALYSIS
+═══════════════════════════════════════════════════════════
+
+TOKEN: EPjFWdd5AufqSSqeM2q1xzybapC8G4wEGGkZwyTDt1v
+PROFILE: balanced
+
+RISK SCORE: 45% [MEDIUM]
+CONFIDENCE: 86% [MEDIUM]
+
+BREAKDOWN:
+───────────────────────────────────────────────────────────
+ ── mint authority active     : active           (+30)  Mint authority is active - owner can create unlimited tokens
+ ── freeze authority active   : active           (+25)  Freeze authority is active - owner can freeze token accounts
+ ── creator supply            : low              (-15)  Top holder has only 8.2% (well distributed)
+ ── holder count              : low               (+5)  Low holder count (24) - early stage or limited adoption
+ ── verified metadata         : verified           (0)  Metadata is verified
+
+METRICS:
+───────────────────────────────────────────────────────────
+  Total Supply               : 1,000,000,000
+  Decimals                   : 6
+  Creator Supply             : 8.20%
+  Holders                    : 24
+  Top Holder                 : 8.20%
+  Wallet Age                 : 120 days ≈ 0.3 years
+
+DATA SOURCES:
+───────────────────────────────────────────────────────────
+  RPC          : ✓ OK
+  Metadata     : ✓ OK
+  Holders      : ✓ OK
+  Wallet Age   : ✓ OK
+
+EDITION LIMITATIONS:
+───────────────────────────────────────────────────────────
+  ✗ Liquidity pool analysis
+  ✗ LP lock / burn detection
+  ✗ Historical transaction patterns
+  ✗ Unlimited batch processing
+
+SUMMARY:
+───────────────────────────────────────────────────────────
+  Medium risk. Multiple risk factors detected. DYOR recommended.
+
+DISCLAIMER:
+───────────────────────────────────────────────────────────
+  Probabilistic assessment based on on-chain heuristics only.
+  NOT financial advice. Always DYOR (Do Your Own Research).
+═══════════════════════════════════════════════════════════
+```
+
+### Sample Output (JSON)
+
+Note: the exact fields may evolve, but this is the current shape.
+
+```json
+{
+  "mint": "EPjFWdd5AufqSSqeM2q1xzybapC8G4wEGGkZwyTDt1v",
+  "risk_score": 45,
+  "confidence_score": 0.86,
+  "profile": "balanced",
+  "flags": {
+    "mint_authority": true,
+    "freeze_authority": true
+  },
+  "metrics": {
+    "creator_supply_pct": 8.2,
+    "wallet_age_days": 120,
+    "holders": 24,
+    "decimals": 6,
+    "total_supply": 1000000000,
+    "top_holder_pct": 8.2
+  },
+  "breakdown": [
+    {
+      "rule": "mint_authority_active",
+      "weight": 30,
+      "description": "Mint authority is active - owner can create unlimited tokens",
+      "status": "active"
+    },
+    {
+      "rule": "freeze_authority_active",
+      "weight": 25,
+      "description": "Freeze authority is active - owner can freeze token accounts",
+      "status": "active"
+    },
+    {
+      "rule": "supply_distributed",
+      "weight": -15,
+      "description": "Top holder has only 8.2% (well distributed)",
+      "status": "low"
+    },
+    {
+      "rule": "low_holders",
+      "weight": 5,
+      "description": "Low holder count (24) - early stage or limited adoption",
+      "status": "low"
+    },
+    {
+      "rule": "verified_metadata",
+      "weight": 0,
+      "description": "Metadata is verified",
+      "status": "verified"
+    }
+  ],
+  "summary": "Medium risk. Multiple risk factors detected. DYOR recommended.",
+  "warnings": [],
+  "data_sources": {
+    "rpc": "ok",
+    "metadata": "ok",
+    "holders": "ok",
+    "wallet_age": "ok"
+  }
+}
 ```
 
 ### How To Interpret Results
@@ -197,10 +332,136 @@ spl-risk --help
 - `--no-cache` - отключить кэш.
 - `--cache-stats` - показать статистику кэша.
 
-Пример JSON-режима:
+### Бесплатный RPC-ключ (Helius)
+
+Можно зарегистрироваться в Helius, получить бесплатный API-ключ и передать его через `--rpc-url`.
+
+Пример:
 
 ```bash
-spl-risk <MINT_ADDRESS> --json
+spl-risk <MINT_ADDRESS> --rpc-url "https://mainnet.helius-rpc.com/?api-key=YOUR_API_KEY"
+```
+
+### Пример вывода (human)
+
+Важно: это репрезентативный пример текущего форматтера.
+
+```text
+═══════════════════════════════════════════════════════════
+SPL TOKEN RISK ANALYSIS
+═══════════════════════════════════════════════════════════
+
+TOKEN: EPjFWdd5AufqSSqeM2q1xzybapC8G4wEGGkZwyTDt1v
+PROFILE: balanced
+
+RISK SCORE: 45% [MEDIUM]
+CONFIDENCE: 86% [MEDIUM]
+
+BREAKDOWN:
+───────────────────────────────────────────────────────────
+ ── mint authority active     : active           (+30)  Mint authority is active - owner can create unlimited tokens
+ ── freeze authority active   : active           (+25)  Freeze authority is active - owner can freeze token accounts
+ ── creator supply            : low              (-15)  Top holder has only 8.2% (well distributed)
+ ── holder count              : low               (+5)  Low holder count (24) - early stage or limited adoption
+ ── verified metadata         : verified           (0)  Metadata is verified
+
+METRICS:
+───────────────────────────────────────────────────────────
+  Total Supply               : 1,000,000,000
+  Decimals                   : 6
+  Creator Supply             : 8.20%
+  Holders                    : 24
+  Top Holder                 : 8.20%
+  Wallet Age                 : 120 days ≈ 0.3 years
+
+DATA SOURCES:
+───────────────────────────────────────────────────────────
+  RPC          : ✓ OK
+  Metadata     : ✓ OK
+  Holders      : ✓ OK
+  Wallet Age   : ✓ OK
+
+EDITION LIMITATIONS:
+───────────────────────────────────────────────────────────
+  ✗ Liquidity pool analysis
+  ✗ LP lock / burn detection
+  ✗ Historical transaction patterns
+  ✗ Unlimited batch processing
+
+SUMMARY:
+───────────────────────────────────────────────────────────
+  Medium risk. Multiple risk factors detected. DYOR recommended.
+
+DISCLAIMER:
+───────────────────────────────────────────────────────────
+  Probabilistic assessment based on on-chain heuristics only.
+  NOT financial advice. Always DYOR (Do Your Own Research).
+═══════════════════════════════════════════════════════════
+```
+
+### Пример вывода (JSON)
+
+Важно: поля могут меняться, но форма сейчас такая.
+
+```json
+{
+  "mint": "EPjFWdd5AufqSSqeM2q1xzybapC8G4wEGGkZwyTDt1v",
+  "risk_score": 45,
+  "confidence_score": 0.86,
+  "profile": "balanced",
+  "flags": {
+    "mint_authority": true,
+    "freeze_authority": true
+  },
+  "metrics": {
+    "creator_supply_pct": 8.2,
+    "wallet_age_days": 120,
+    "holders": 24,
+    "decimals": 6,
+    "total_supply": 1000000000,
+    "top_holder_pct": 8.2
+  },
+  "breakdown": [
+    {
+      "rule": "mint_authority_active",
+      "weight": 30,
+      "description": "Mint authority is active - owner can create unlimited tokens",
+      "status": "active"
+    },
+    {
+      "rule": "freeze_authority_active",
+      "weight": 25,
+      "description": "Freeze authority is active - owner can freeze token accounts",
+      "status": "active"
+    },
+    {
+      "rule": "supply_distributed",
+      "weight": -15,
+      "description": "Top holder has only 8.2% (well distributed)",
+      "status": "low"
+    },
+    {
+      "rule": "low_holders",
+      "weight": 5,
+      "description": "Low holder count (24) - early stage or limited adoption",
+      "status": "low"
+    },
+    {
+      "rule": "verified_metadata",
+      "weight": 0,
+      "description": "Metadata is verified",
+      "status": "verified"
+    }
+  ],
+  "summary": "Medium risk. Multiple risk factors detected. DYOR recommended.",
+  "warnings": [],
+  "data_sources": {
+    "rpc": "ok",
+    "metadata": "ok",
+    "holders": "ok",
+    "wallet_age": "ok"
+  }
+}
 ```
 
 ### Интерпретация результата

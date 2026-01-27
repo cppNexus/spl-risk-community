@@ -1,0 +1,24 @@
+
+
+[package]
+name = "spl-risk-output"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.75"
+license = "MIT"
+description = "Human and JSON output formatting for SPL Risk"
+
+[dependencies]
+# Core report/model types
+spl-risk-core = { path = "../spl-risk-core" }
+
+# Shared deps
+anyhow = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+colored = { workspace = true }
+chrono = { workspace = true }
+
+[features]
+default = []
+lp-analysis = []
