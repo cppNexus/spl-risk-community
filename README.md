@@ -42,12 +42,12 @@ You can download a ready-to-use precompiled binary for your operating system fro
 
 2. Download the archive for your platform:
 
-   - **Linux (glibc)**: `spl-risk-vX.Y.Z-linux-x86_64.tar.gz`
-   - **Linux (static, musl)**: `spl-risk-vX.Y.Z-linux-musl-x86_64.tar.gz`
-   - **Linux (ARM64)**: `spl-risk-vX.Y.Z-linux-aarch64.tar.gz`
-   - **macOS (Intel)**: `spl-risk-vX.Y.Z-macos-x86_64.tar.gz`
-   - **macOS (Apple Silicon)**: `spl-risk-vX.Y.Z-macos-aarch64.tar.gz`
-   - **Windows**: `spl-risk-vX.Y.Z-windows-x86_64.zip`
+   - **Linux (glibc)**: `spl-risk-v0.1.0-linux-x86_64.tar.gz`
+   - **Linux (static, musl)**: `spl-risk-v0.1.0-linux-musl-x86_64.tar.gz`
+   - **Linux (ARM64)**: `spl-risk-v0.1.0-linux-aarch64.tar.gz`
+   - **macOS (Intel)**: `spl-risk-v0.1.0-macos-x86_64.tar.gz`
+   - **macOS (Apple Silicon)**: `spl-risk-v0.1.0-macos-aarch64.tar.gz`
+   - **Windows**: `spl-risk-v0.1.0-windows-x86_64.zip`
 
 3. Extract the archive and make the binary executable (Linux/macOS):
 
@@ -85,6 +85,21 @@ foreach ($l in $lines) {
 "OK"
 ```
 
+### Verify GPG signature
+
+Each release also includes a detached signature file: `SHA256SUMS.asc`.
+
+1) Download `SHA256SUMS` and `SHA256SUMS.asc` into the same folder.
+
+2) Import the maintainer public key from this repository and verify the signature:
+
+```bash
+gpg --import publickey.asc
+gpg --verify SHA256SUMS.asc SHA256SUMS
+```
+
+Always verify that the key fingerprint matches the fingerprint published by the maintainer.
+
 ## Скачать готовый бинарник
 
 Вы можете скачать **готовый скомпилированный бинарник** под вашу операционную систему со страницы **GitHub Releases** — установка Rust не требуется.
@@ -94,12 +109,12 @@ foreach ($l in $lines) {
 
 2. Скачайте архив под вашу платформу:
 
-   - **Linux (glibc)**: `spl-risk-vX.Y.Z-linux-x86_64.tar.gz`
-   - **Linux (static, musl)**: `spl-risk-vX.Y.Z-linux-musl-x86_64.tar.gz`
-   - **Linux (ARM64)**: `spl-risk-vX.Y.Z-linux-aarch64.tar.gz`
-   - **macOS (Intel)**: `spl-risk-vX.Y.Z-macos-x86_64.tar.gz`
-   - **macOS (Apple Silicon)**: `spl-risk-vX.Y.Z-macos-aarch64.tar.gz`
-   - **Windows**: `spl-risk-vX.Y.Z-windows-x86_64.zip`
+   - **Linux (glibc)**: `spl-risk-v0.1.0-linux-x86_64.tar.gz`
+   - **Linux (static, musl)**: `spl-risk-v0.1.0-linux-musl-x86_64.tar.gz`
+   - **Linux (ARM64)**: `spl-risk-v0.1.0-linux-aarch64.tar.gz`
+   - **macOS (Intel)**: `spl-risk-v0.1.0-macos-x86_64.tar.gz`
+   - **macOS (Apple Silicon)**: `spl-risk-v0.1.0-macos-aarch64.tar.gz`
+   - **Windows**: `spl-risk-v0.1.0-windows-x86_64.zip`
 
 3. Распакуйте архив и запустите бинарник.
 
@@ -137,6 +152,21 @@ foreach ($l in $lines) {
 }
 "OK"
 ```
+
+### Проверка подписи GPG
+
+В каждом релизе также лежит отделённая подпись: `SHA256SUMS.asc`.
+
+1) Скачайте `SHA256SUMS` и `SHA256SUMS.asc` в одну папку.
+
+2) Импортируйте публичный ключ мейнтейнера из этого репозитория и проверьте подпись:
+
+```bash
+gpg --import publickey.asc
+gpg --verify SHA256SUMS.asc SHA256SUMS
+```
+
+Всегда сверяйте fingerprint ключа с fingerprint, который публикует мейнтейнер.
 
 ### Quick Start
 
@@ -345,7 +375,7 @@ Exit codes (useful for CI / scripts):
 
 This version is intentionally simple and free. In particular:
 
-- No release signature verification.
+- Release artifacts are provided with SHA256 checksums (and a GPG signature of the checksum file), but binaries may still be unsigned and are not audited.
 - No audits and no formal correctness guarantees.
 - No deep LP / liquidity analysis (unless added separately).
 - RPC limits can lead to incomplete data.
@@ -589,7 +619,7 @@ DISCLAIMER:
 
 Эта версия намеренно простая и бесплатная. В частности:
 
-- Нет проверки подписи релизов.
+- Для релизов публикуются SHA256 (и GPG-подпись файла контрольных сумм), но сами бинарники могут быть без подписи и без аудита.
 - Нет аудита и формальных гарантий корректности.
 - Нет глубокого LP / liquidity-анализа (если не добавлен отдельно).
 - Из-за лимитов RPC данные могут быть неполными.
