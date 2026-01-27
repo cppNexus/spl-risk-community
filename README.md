@@ -33,6 +33,63 @@ Important: this is the free community edition, provided "as is". Releases may be
 - Low holder count.
 - Metadata presence and verification.
 
+## Download Prebuilt Binary
+
+You can download a ready-to-use precompiled binary for your operating system from **GitHub Releases** — no Rust toolchain required.
+
+1. Go to the **Releases** page:
+   https://github.com/solana-labs/spl-risk-community/releases
+
+2. Download the archive for your platform:
+
+   - **Linux (glibc)**: `spl-risk-vX.Y.Z-linux-x86_64.tar.gz`
+   - **Linux (static, musl)**: `spl-risk-vX.Y.Z-linux-musl-x86_64.tar.gz`
+   - **Linux (ARM64)**: `spl-risk-vX.Y.Z-linux-aarch64.tar.gz`
+   - **macOS (Intel)**: `spl-risk-vX.Y.Z-macos-x86_64.tar.gz`
+   - **macOS (Apple Silicon)**: `spl-risk-vX.Y.Z-macos-aarch64.tar.gz`
+   - **Windows**: `spl-risk-vX.Y.Z-windows-x86_64.zip`
+
+3. Extract the archive and make the binary executable (Linux/macOS):
+
+   ```bash
+   tar -xzf spl-risk-*.tar.gz
+   chmod +x spl-risk
+   ./spl-risk <MINT_ADDRESS>
+   ```
+
+   On Windows, unzip the archive and run `spl-risk.exe` from PowerShell or CMD.
+
+> Note: Community Edition binaries are provided **as-is**, may be unsigned, and are not audited. Always verify checksums and DYOR.
+
+## Скачать готовый бинарник
+
+Вы можете скачать **готовый скомпилированный бинарник** под вашу операционную систему со страницы **GitHub Releases** — установка Rust не требуется.
+
+1. Перейдите на страницу релизов:
+   https://github.com/solana-labs/spl-risk-community/releases
+
+2. Скачайте архив под вашу платформу:
+
+   - **Linux (glibc)**: `spl-risk-vX.Y.Z-linux-x86_64.tar.gz`
+   - **Linux (static, musl)**: `spl-risk-vX.Y.Z-linux-musl-x86_64.tar.gz`
+   - **Linux (ARM64)**: `spl-risk-vX.Y.Z-linux-aarch64.tar.gz`
+   - **macOS (Intel)**: `spl-risk-vX.Y.Z-macos-x86_64.tar.gz`
+   - **macOS (Apple Silicon)**: `spl-risk-vX.Y.Z-macos-aarch64.tar.gz`
+   - **Windows**: `spl-risk-vX.Y.Z-windows-x86_64.zip`
+
+3. Распакуйте архив и запустите бинарник.
+
+   **Linux / macOS:**
+   ```bash
+   tar -xzf spl-risk-*.tar.gz
+   chmod +x spl-risk
+   ./spl-risk <MINT_ADDRESS>
+   ```
+
+   **Windows:** распакуйте архив и запустите `spl-risk.exe` через PowerShell или CMD.
+
+> Примечание: Community Edition поставляется **"как есть"**, бинарники могут быть без подписи и без аудита. Всегда проверяйте контрольные суммы и делайте DYOR.
+
 ### Quick Start
 
 Requirements:
