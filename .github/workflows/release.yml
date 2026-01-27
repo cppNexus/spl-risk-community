@@ -138,25 +138,28 @@ jobs:
           PY
 
       - name: Import GPG key
-        if: ${{ secrets.GPG_PRIVATE_KEY != '' }}
         shell: bash
         env:
           GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
         run: |
           set -euo pipefail
-          if [ -z "${GPG_PRIVATE_KEY}" ]; then
-            echo "GPG_PRIVATE_KEY secret is not set" >&2
-            exit 1
+          if [ -z "${GPG_PRIVATE_KEY:-}" ]; then
+            echo "GPG_PRIVATE_KEY secret is not set; skipping GPG import" >&2
+            exit 0
           fi
           echo "$GPG_PRIVATE_KEY" | gpg --batch --yes --import
 
       - name: Sign SHA256SUMS (GPG)
-        if: ${{ secrets.GPG_PRIVATE_KEY != '' }}
         shell: bash
         env:
+          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
           GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
         run: |
           set -euo pipefail
+          if [ -z "${GPG_PRIVATE_KEY:-}" ]; then
+            echo "GPG_PRIVATE_KEY secret is not set; skipping GPG signing" >&2
+            exit 0
+          fi
           if [ -n "${GPG_PASSPHRASE:-}" ]; then
             gpg --batch --yes --pinentry-mode loopback --passphrase "$GPG_PASSPHRASE" \
               --armor --detach-sign --output SHA256SUMS.asc SHA256SUMS
@@ -173,7 +176,7 @@ jobs:
             SHA256SUMS
 
       - name: Upload signature to GitHub Release
-        if: ${{ secrets.GPG_PRIVATE_KEY != '' }}
+        if: ${{ hashFiles('SHA256SUMS.asc') != '' }}
         uses: softprops/action-gh-release@v2
         with:
           files: |
