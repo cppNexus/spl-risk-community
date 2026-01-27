@@ -59,7 +59,31 @@ You can download a ready-to-use precompiled binary for your operating system fro
 
    On Windows, unzip the archive and run `spl-risk.exe` from PowerShell or CMD.
 
-> Note: Community Edition binaries are provided **as-is**, may be unsigned, and are not audited. Always verify checksums and DYOR.
+
+### Verify checksums (SHA256)
+
+Each release also includes a `SHA256SUMS` file. After downloading the archive for your platform, verify its SHA256 checksum.
+
+**Linux / macOS:**
+```bash
+# Download the archive + SHA256SUMS into the same folder, then:
+sha256sum -c SHA256SUMS 2>/dev/null || shasum -a 256 -c SHA256SUMS
+```
+
+**Windows (PowerShell):**
+```powershell
+# In the folder containing the downloaded archive and SHA256SUMS:
+$lines = Get-Content .\SHA256SUMS
+foreach ($l in $lines) {
+  if ($l.Trim().Length -eq 0) { continue }
+  $parts = $l -split '\s+'
+  $expected = $parts[0]
+  $file = $parts[-1]
+  $actual = (Get-FileHash $file -Algorithm SHA256).Hash.ToLower()
+  if ($actual -ne $expected.ToLower()) { throw "SHA256 mismatch for $file" }
+}
+"OK"
+```
 
 ## Скачать готовый бинарник
 
@@ -88,7 +112,31 @@ You can download a ready-to-use precompiled binary for your operating system fro
 
    **Windows:** распакуйте архив и запустите `spl-risk.exe` через PowerShell или CMD.
 
-> Примечание: Community Edition поставляется **"как есть"**, бинарники могут быть без подписи и без аудита. Всегда проверяйте контрольные суммы и делайте DYOR.
+
+### Проверка контрольных сумм (SHA256)
+
+В каждом релизе также лежит файл `SHA256SUMS`. После скачивания архива под вашу платформу проверьте SHA256.
+
+**Linux / macOS:**
+```bash
+# Скачайте архив и SHA256SUMS в одну папку, затем:
+sha256sum -c SHA256SUMS 2>/dev/null || shasum -a 256 -c SHA256SUMS
+```
+
+**Windows (PowerShell):**
+```powershell
+# В папке с архивом и SHA256SUMS:
+$lines = Get-Content .\SHA256SUMS
+foreach ($l in $lines) {
+  if ($l.Trim().Length -eq 0) { continue }
+  $parts = $l -split '\s+'
+  $expected = $parts[0]
+  $file = $parts[-1]
+  $actual = (Get-FileHash $file -Algorithm SHA256).Hash.ToLower()
+  if ($actual -ne $expected.ToLower()) { throw "SHA256 не совпадает для $file" }
+}
+"OK"
+```
 
 ### Quick Start
 

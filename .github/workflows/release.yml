@@ -110,9 +110,37 @@ jobs:
           Copy-Item "target\${{ matrix.target }}\release\$bin" "dist\$bin"
           Compress-Archive -Path "dist\$bin" -DestinationPath $out -Force
 
+      - name: Generate SHA256 checksums
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import glob, hashlib, os
+
+          files = sorted(glob.glob('*.tar.gz') + glob.glob('*.zip'))
+          if not files:
+              raise SystemExit('No archives found to checksum')
+
+          def sha256(path: str) -> str:
+              h = hashlib.sha256()
+              with open(path, 'rb') as f:
+                  for chunk in iter(lambda: f.read(1024 * 1024), b''):
+                      h.update(chunk)
+              return h.hexdigest()
+
+          with open('SHA256SUMS', 'w', encoding='utf-8') as out:
+              for p in files:
+                  out.write(f"{sha256(p)}  {os.path.basename(p)}\n")
+
+          print('Wrote SHA256SUMS for:')
+          for p in files:
+              print(' -', p)
+          PY
+
       - name: Upload to GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           files: |
             *.tar.gz
             *.zip
+            SHA256SUMS
