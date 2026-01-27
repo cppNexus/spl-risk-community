@@ -66,9 +66,25 @@ jobs:
       # Cross compile deps for ARM Linux
       - name: Install aarch64 toolchain
         if: matrix.target == 'aarch64-unknown-linux-gnu'
-        run: sudo apt-get update && sudo apt-get install -y gcc-aarch64-linux-gnu
+        run: sudo apt-get update && sudo apt-get install -y gcc-aarch64-linux-gnu binutils-aarch64-linux-gnu
 
-      - name: Build
+      - name: Build (default)
+        if: matrix.target != 'aarch64-unknown-linux-gnu' && matrix.target != 'x86_64-unknown-linux-musl'
+        run: cargo build -p spl-risk --release --target ${{ matrix.target }}
+
+      - name: Build (aarch64 linux)
+        if: matrix.target == 'aarch64-unknown-linux-gnu'
+        env:
+          CC_aarch64_unknown_linux_gnu: aarch64-linux-gnu-gcc
+          CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER: aarch64-linux-gnu-gcc
+          AR_aarch64_unknown_linux_gnu: aarch64-linux-gnu-ar
+        run: cargo build -p spl-risk --release --target ${{ matrix.target }}
+
+      - name: Build (musl)
+        if: matrix.target == 'x86_64-unknown-linux-musl'
+        env:
+          CC_x86_64_unknown_linux_musl: musl-gcc
+          CARGO_TARGET_X86_64_UNKNOWN_LINUX_MUSL_LINKER: musl-gcc
         run: cargo build -p spl-risk --release --target ${{ matrix.target }}
 
       # ---------- Package (Unix) ----------
