@@ -100,6 +100,10 @@ gpg --verify SHA256SUMS.asc SHA256SUMS
 
 Always verify that the key fingerprint matches the fingerprint published by the maintainer.
 
+Maintainer key fingerprint:
+
+`E55A F122 91F5 5B60 650A 8F15 606E 316E 14AD BE31`
+
 ## Скачать готовый бинарник
 
 Вы можете скачать **готовый скомпилированный бинарник** под вашу операционную систему со страницы **GitHub Releases** — установка Rust не требуется.
@@ -167,6 +171,10 @@ gpg --verify SHA256SUMS.asc SHA256SUMS
 ```
 
 Всегда сверяйте fingerprint ключа с fingerprint, который публикует мейнтейнер.
+
+Fingerprint ключа мейнтейнера:
+
+`E55A F122 91F5 5B60 650A 8F15 606E 316E 14AD BE31`
 
 ### Quick Start
 
