@@ -137,6 +137,31 @@ jobs:
               print(' -', p)
           PY
 
+      - name: Import GPG key
+        shell: bash
+        env:
+          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+        run: |
+          set -euo pipefail
+          if [ -z "${GPG_PRIVATE_KEY}" ]; then
+            echo "GPG_PRIVATE_KEY secret is not set" >&2
+            exit 1
+          fi
+          echo "$GPG_PRIVATE_KEY" | gpg --batch --yes --import
+
+      - name: Sign SHA256SUMS (GPG)
+        shell: bash
+        env:
+          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+        run: |
+          set -euo pipefail
+          if [ -n "${GPG_PASSPHRASE:-}" ]; then
+            gpg --batch --yes --pinentry-mode loopback --passphrase "$GPG_PASSPHRASE" \
+              --armor --detach-sign --output SHA256SUMS.asc SHA256SUMS
+          else
+            gpg --batch --yes --armor --detach-sign --output SHA256SUMS.asc SHA256SUMS
+          fi
+
       - name: Upload to GitHub Release
         uses: softprops/action-gh-release@v2
         with:
@@ -144,3 +169,4 @@ jobs:
             *.tar.gz
             *.zip
             SHA256SUMS
+            SHA256SUMS.asc
