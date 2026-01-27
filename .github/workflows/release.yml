@@ -138,6 +138,7 @@ jobs:
           PY
 
       - name: Import GPG key
+        if: ${{ secrets.GPG_PRIVATE_KEY != '' }}
         shell: bash
         env:
           GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
@@ -150,6 +151,7 @@ jobs:
           echo "$GPG_PRIVATE_KEY" | gpg --batch --yes --import
 
       - name: Sign SHA256SUMS (GPG)
+        if: ${{ secrets.GPG_PRIVATE_KEY != '' }}
         shell: bash
         env:
           GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
@@ -169,4 +171,10 @@ jobs:
             *.tar.gz
             *.zip
             SHA256SUMS
+
+      - name: Upload signature to GitHub Release
+        if: ${{ secrets.GPG_PRIVATE_KEY != '' }}
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
             SHA256SUMS.asc
