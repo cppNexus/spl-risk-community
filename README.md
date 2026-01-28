@@ -5,6 +5,7 @@
 [![Edition: Community](https://img.shields.io/badge/Edition-Community-blue)](crates/spl-risk-community/src/heuristics/mod.rs)
 [![Status: As-Is](https://img.shields.io/badge/Status-As--Is-lightgrey)](README.md)
 [![CI](https://github.com/cppNexus/spl-risk-community/actions/workflows/ci.yml/badge.svg)](https://github.com/cppNexus/spl-risk-community/actions/workflows/ci.yml)
+[![Release](https://github.com/cppNexus/spl-risk-community/actions/workflows/release.yml/badge.svg)](https://github.com/cppNexus/spl-risk-community/actions/workflows/release.yml)
 
 **TL;DR (EN):** Free, deterministic SPL token risk CLI. Community edition is unsigned/unaudited and shipped as-is.
 
