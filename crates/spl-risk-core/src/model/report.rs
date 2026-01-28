@@ -105,7 +105,7 @@ impl RiskReport {
 
     pub fn calculate_score(&mut self) {
         let total: i32 = self.breakdown.iter().map(|b| b.weight).sum();
-        self.risk_score = total.max(0).min(100) as u32;
+        self.risk_score = total.clamp(0, 100) as u32;
     }
 
     pub fn update_confidence(&mut self) {

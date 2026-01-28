@@ -48,10 +48,11 @@ impl<P: TokenDataProvider> RiskAnalyzer<P> {
         }
 
         // Enrich top holder wallet ages (only top 10 to limit RPC calls)
-        if let Err(_) = self
+        if self
             .provider
             .enrich_holder_ages(&mut token_data.holders)
             .await
+            .is_err()
         {
             report.data_sources.wallet_age = "missing".to_string();
         }
