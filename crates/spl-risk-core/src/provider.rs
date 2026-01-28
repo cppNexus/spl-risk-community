@@ -1,8 +1,8 @@
+use crate::model::token::TokenHolder;
+use crate::model::TokenData;
+use anyhow::Result;
 use async_trait::async_trait;
 use solana_sdk::pubkey::Pubkey;
-use anyhow::Result;
-use crate::model::TokenData;
-use crate::model::token::TokenHolder;
 
 #[async_trait]
 pub trait TokenDataProvider: Send + Sync {

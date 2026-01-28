@@ -11,9 +11,9 @@ impl RiskRule for VerifiedMetadataRule {
                 if metadata.is_verified {
                     report.add_rule(
                         "verified_metadata",
-                        0,  // нейтральный вес или отрицательный бонус
+                        0, // нейтральный вес или отрицательный бонус
                         "Metadata is verified",
-                        Some("verified"),  // ← зелёный флаг
+                        Some("verified"), // ← зелёный флаг
                     );
                 } else {
                     report.add_rule(
@@ -34,7 +34,7 @@ impl RiskRule for VerifiedMetadataRule {
             }
         }
     }
-    
+
     fn name(&self) -> &str {
         "verified_metadata"
     }

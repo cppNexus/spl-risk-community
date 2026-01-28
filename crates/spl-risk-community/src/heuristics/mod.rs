@@ -1,13 +1,13 @@
 mod authorities;
-mod supply;
 mod metadata;
+mod supply;
 
 // #[cfg(test)]
 // mod tests;
 
 pub use authorities::*;
-pub use supply::*;
 pub use metadata::*;
+pub use supply::*;
 
 pub fn get_community_rules() -> Vec<Box<dyn spl_risk_core::heuristics::RiskRule>> {
     let mut rules: Vec<Box<dyn spl_risk_core::heuristics::RiskRule>> = Vec::new();
@@ -29,9 +29,12 @@ pub fn get_pro_rules() -> Vec<Box<dyn spl_risk_core::heuristics::RiskRule>> {
 
     #[cfg(feature = "lp-analysis")]
     {
-        rules.push(Box::new(crate::heuristics::lp::LpDetectionRule) as Box<dyn spl_risk_core::heuristics::RiskRule>);
-        rules.push(Box::new(crate::heuristics::lp::LpValueRule) as Box<dyn spl_risk_core::heuristics::RiskRule>);
-        rules.push(Box::new(crate::heuristics::lp::LpLockRule) as Box<dyn spl_risk_core::heuristics::RiskRule>);
+        rules.push(Box::new(crate::heuristics::lp::LpDetectionRule)
+            as Box<dyn spl_risk_core::heuristics::RiskRule>);
+        rules.push(Box::new(crate::heuristics::lp::LpValueRule)
+            as Box<dyn spl_risk_core::heuristics::RiskRule>);
+        rules.push(Box::new(crate::heuristics::lp::LpLockRule)
+            as Box<dyn spl_risk_core::heuristics::RiskRule>);
     }
 
     rules

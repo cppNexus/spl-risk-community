@@ -1,20 +1,20 @@
 use crate::cache::Cache;
-use async_trait::async_trait;
-use spl_risk_core::error::RiskError;
-use spl_risk_core::model::token::TokenMetadata;
-use spl_risk_core::model::token::TokenHolder;
-use spl_risk_core::model::token::TokenData;
-use spl_risk_core::provider::TokenDataProvider;
 use anyhow::Result;
+use async_trait::async_trait;
 use solana_client::nonblocking::rpc_client::RpcClient;
 use solana_commitment_config::CommitmentConfig;
+use solana_program::program_option::COption;
 use solana_sdk::pubkey::Pubkey;
+use spl_risk_core::error::RiskError;
+use spl_risk_core::model::token::TokenData;
+use spl_risk_core::model::token::TokenHolder;
+use spl_risk_core::model::token::TokenMetadata;
+use spl_risk_core::provider::TokenDataProvider;
 use spl_token_2022::extension::StateWithExtensions;
 use spl_token_2022::state::{Account as TokenAccount, Mint};
+use std::str::FromStr;
 use std::sync::Arc;
 use std::time::Duration;
-use solana_program::program_option::COption;
-use std::str::FromStr;
 
 pub struct SolanaRpcClient {
     client: Arc<RpcClient>,
@@ -72,13 +72,13 @@ impl SolanaRpcClient {
         let token_program_id = spl_token_2022::id();
         let owner_pubkey = Pubkey::from(mint_account.owner.to_bytes());
         let program_pubkey = Pubkey::from(token_program_id.to_bytes());
-        
+
         // Also check legacy spl-token program ID
         let legacy_token_program = Pubkey::from([
-            6, 221, 246, 225, 215, 101, 161, 147, 217, 203, 225, 70, 206, 235, 121, 172,
-            28, 180, 133, 237, 95, 91, 55, 145, 58, 140, 245, 133, 126, 255, 0, 169,
+            6, 221, 246, 225, 215, 101, 161, 147, 217, 203, 225, 70, 206, 235, 121, 172, 28, 180,
+            133, 237, 95, 91, 55, 145, 58, 140, 245, 133, 126, 255, 0, 169,
         ]);
-        
+
         if owner_pubkey != program_pubkey && owner_pubkey != legacy_token_program {
             return Err(RiskError::NotSplToken.into());
         }
@@ -100,16 +100,12 @@ impl SolanaRpcClient {
 
         // Convert COption to Option<Pubkey>
         let mint_authority = match mint_data.base.mint_authority {
-            COption::Some(key) => {
-                Some(Pubkey::from(key.to_bytes()))
-            }
+            COption::Some(key) => Some(Pubkey::from(key.to_bytes())),
             COption::None => None,
         };
 
         let freeze_authority = match mint_data.base.freeze_authority {
-            COption::Some(key) => {
-                Some(Pubkey::from(key.to_bytes()))
-            }
+            COption::Some(key) => Some(Pubkey::from(key.to_bytes())),
             COption::None => None,
         };
 
@@ -140,11 +136,11 @@ impl SolanaRpcClient {
         _decimals: u8,
     ) -> Result<Vec<TokenHolder>> {
         eprintln!("Fetching top token holders...");
-        
+
         // Retry с экспоненциальным backoff
         let mut retries = 3;
         let mut delay = Duration::from_secs(2);
-        
+
         let largest = loop {
             match self.client.get_token_largest_accounts(mint).await {
                 Ok(accounts) => break accounts,
@@ -153,43 +149,48 @@ impl SolanaRpcClient {
                         eprintln!("Failed to fetch largest accounts after retries: {}", e);
                         return Err(RiskError::RpcError(e.to_string()).into());
                     }
-                    
-                    eprintln!("Rate limited, retrying in {:?}... ({} retries left)", delay, retries);
+
+                    eprintln!(
+                        "Rate limited, retrying in {:?}... ({} retries left)",
+                        delay, retries
+                    );
                     tokio::time::sleep(delay).await;
                     delay *= 2; // Exponential backoff: 2s, 4s, 8s
                     retries -= 1;
                 }
             }
         };
-        
+
         if largest.is_empty() {
             eprintln!("Warning: No holders found for this token");
             return Ok(Vec::new());
         }
-        
+
         eprintln!("Found {} top holders", largest.len());
-        
+
         let mut holders = Vec::new();
-        
+
         for account_info in largest {
-            let amount = account_info.amount.amount
+            let amount = account_info
+                .amount
+                .amount
                 .parse::<u64>()
                 .unwrap_or_else(|e| {
                     eprintln!("Failed to parse amount: {}", e);
                     0
                 });
-            
+
             if amount > 0 {
                 let percentage = (amount as f64 / total_supply as f64) * 100.0;
-                
+
                 let token_account_addr = match Pubkey::from_str(&account_info.address) {
                     Ok(addr) => addr,
                     Err(_) => continue,
                 };
-                
+
                 // Добавить небольшую задержку между запросами владельцев
                 tokio::time::sleep(Duration::from_millis(100)).await;
-                
+
                 let owner_pubkey = match self.get_token_account_owner(&token_account_addr).await {
                     Ok(owner) => owner,
                     Err(e) => {
@@ -197,7 +198,7 @@ impl SolanaRpcClient {
                         token_account_addr
                     }
                 };
-                
+
                 holders.push(TokenHolder {
                     address: owner_pubkey,
                     amount,
@@ -206,21 +207,22 @@ impl SolanaRpcClient {
                 });
             }
         }
-        
+
         holders.sort_by(|a, b| b.amount.cmp(&a.amount));
-        
+
         Ok(holders)
     }
 
     async fn get_token_account_owner(&self, token_account: &Pubkey) -> Result<Pubkey> {
-        let account = self.client
+        let account = self
+            .client
             .get_account(token_account)
             .await
             .map_err(|e| RiskError::RpcError(e.to_string()))?;
-        
+
         let state = StateWithExtensions::<TokenAccount>::unpack(&account.data)
             .map_err(|e| RiskError::ParseError(e.to_string()))?;
-        
+
         Ok(Pubkey::from(state.base.owner.to_bytes()))
     }
 
@@ -254,10 +256,10 @@ impl SolanaRpcClient {
         // Try to parse metadata - handle different mpl_token_metadata versions
         // For mpl-token-metadata 5.x, the structure might be different
         // We'll extract basic info manually if needed
-        
+
         // Simple parsing for name, symbol, uri (first ~100 bytes typically contain this)
         let data = &account.data;
-        
+
         // Metadata structure (simplified):
         // - key (1 byte)
         // - update_authority (32 bytes)
@@ -265,13 +267,13 @@ impl SolanaRpcClient {
         // - name (4 + 32 bytes string)
         // - symbol (4 + 10 bytes string)
         // - uri (4 + 200 bytes string)
-        
+
         let mut offset = 1 + 32 + 32; // Skip key, update_authority, mint
-        
+
         let name = Self::read_string(data, &mut offset)?;
         let symbol = Self::read_string(data, &mut offset)?;
         let uri = Self::read_string(data, &mut offset)?;
-        
+
         // For verified check, we'd need to parse collection info
         // For now, default to false (can be enhanced later)
         let is_verified = false;
@@ -284,33 +286,32 @@ impl SolanaRpcClient {
         };
 
         // Cache the result
-        self.metadata_cache
-            .insert(*mint, token_metadata.clone());
+        self.metadata_cache.insert(*mint, token_metadata.clone());
 
         Ok(token_metadata)
     }
-    
+
     fn read_string(data: &[u8], offset: &mut usize) -> Result<String> {
         if *offset + 4 > data.len() {
             return Ok(String::new());
         }
-        
+
         let len = u32::from_le_bytes([
             data[*offset],
             data[*offset + 1],
             data[*offset + 2],
             data[*offset + 3],
         ]) as usize;
-        
+
         *offset += 4;
-        
+
         if *offset + len > data.len() {
             return Ok(String::new());
         }
-        
+
         let string = String::from_utf8_lossy(&data[*offset..*offset + len]).to_string();
         *offset += len;
-        
+
         Ok(string)
     }
 

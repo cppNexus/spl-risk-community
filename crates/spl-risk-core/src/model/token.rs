@@ -11,7 +11,7 @@ pub struct TokenData {
     pub metadata: Option<TokenMetadata>,
     pub holders: Vec<TokenHolder>,
     pub creation_timestamp: Option<i64>,
-    
+
     #[cfg(feature = "lp-analysis")]
     pub lp_pools: Vec<LiquidityPool>,
 }
@@ -47,19 +47,19 @@ impl TokenData {
     pub fn total_supply(&self) -> u64 {
         self.supply
     }
-    
+
     pub fn holder_count(&self) -> usize {
         self.holders.len()
     }
-    
+
     pub fn creator_address(&self) -> Option<Pubkey> {
         self.holders.first().map(|h| h.address)
     }
-    
+
     pub fn creator_supply_percentage(&self) -> f64 {
         self.holders.first().map(|h| h.percentage).unwrap_or(0.0)
     }
-    
+
     pub fn is_supply_concentrated(&self, threshold: f64) -> bool {
         self.creator_supply_percentage() > threshold
     }

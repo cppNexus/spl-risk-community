@@ -16,7 +16,7 @@ pub struct Cli {
     /// SPL token mint address to analyze
     #[arg(value_parser = parse_pubkey)]
     pub mint_address: Pubkey,
-    
+
     /// Solana RPC endpoint URL
     #[arg(
         short = 'r',
@@ -25,7 +25,7 @@ pub struct Cli {
         default_value = "https://api.mainnet-beta.solana.com"
     )]
     pub rpc_url: String,
-    
+
     /// Risk profile: conservative, balanced, or degenerate
     #[arg(
         short = 'p',
@@ -34,23 +34,23 @@ pub struct Cli {
         value_parser = ["conservative", "balanced", "degenerate"]
     )]
     pub profile: String,
-    
+
     /// Output results as JSON
     #[arg(short = 'j', long)]
     pub json: bool,
-    
+
     /// Show detailed breakdown
     #[arg(short = 'v', long)]
     pub verbose: bool,
-    
+
     /// Request timeout in seconds
     #[arg(short = 't', long, default_value = "10", value_parser = parse_duration)]
     pub timeout: Duration,
-    
+
     /// Disable caching
     #[arg(long)]
     pub no_cache: bool,
-    
+
     /// Show cache statistics
     #[arg(long)]
     pub cache_stats: bool,

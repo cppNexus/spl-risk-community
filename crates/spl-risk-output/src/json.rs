@@ -1,5 +1,5 @@
-use spl_risk_core::model::RiskReport;
 use anyhow::Result;
+use spl_risk_core::model::RiskReport;
 
 pub fn print_report(report: &RiskReport) -> Result<()> {
     let json = serde_json::to_string_pretty(report)?;

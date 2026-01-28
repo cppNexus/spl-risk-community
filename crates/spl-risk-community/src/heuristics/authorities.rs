@@ -23,7 +23,7 @@ impl RiskRule for MintAuthorityRule {
             );
         }
     }
-    
+
     fn name(&self) -> &str {
         "mint_authority"
     }
@@ -39,18 +39,18 @@ impl RiskRule for FreezeAuthorityRule {
                 "freeze_authority_active",
                 config.weights.freeze_authority_active,
                 "Freeze authority is active - owner can freeze token accounts",
-                Some("active")
+                Some("active"),
             );
         } else {
             report.add_rule(
                 "freeze_revoked",
                 config.weights.freeze_revoked,
                 "Freeze authority revoked - accounts cannot be frozen",
-                Some("revoked")
+                Some("revoked"),
             );
         }
     }
-    
+
     fn name(&self) -> &str {
         "freeze_authority"
     }
@@ -61,25 +61,27 @@ pub struct CreatorIsAuthorityRule;
 impl RiskRule for CreatorIsAuthorityRule {
     fn evaluate(&self, token: &TokenData, config: &Config, report: &mut RiskReport) {
         if let Some(creator) = token.creator_address() {
-            let is_mint_authority = token.mint_authority
+            let is_mint_authority = token
+                .mint_authority
                 .map(|auth| auth == creator)
                 .unwrap_or(false);
-            
-            let is_freeze_authority = token.freeze_authority
+
+            let is_freeze_authority = token
+                .freeze_authority
                 .map(|auth| auth == creator)
                 .unwrap_or(false);
-            
+
             if is_mint_authority || is_freeze_authority {
                 report.add_rule(
                     "creator_is_authority",
                     config.weights.creator_is_authority,
                     "Token creator retains mint or freeze authority",
-                    Some("retains")
+                    Some("retains"),
                 );
             }
         }
     }
-    
+
     fn name(&self) -> &str {
         "creator_is_authority"
     }

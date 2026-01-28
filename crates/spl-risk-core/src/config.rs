@@ -14,17 +14,17 @@ pub struct RiskWeights {
     pub freeze_authority_active: i32,
     pub creator_supply_high: i32,
     pub creator_is_authority: i32,
-    
+
     // Medium
     pub wallet_young: i32,
     pub low_holders: i32,
     pub no_verified_metadata: i32,
-    
+
     // Risk reducers
     pub mint_revoked: i32,
     pub freeze_revoked: i32,
     pub supply_distributed: i32,
-    
+
     #[cfg(feature = "lp-analysis")]
     pub no_lp_detected: i32,
     #[cfg(feature = "lp-analysis")]
@@ -41,7 +41,7 @@ pub struct Thresholds {
     pub supply_distributed_pct: f64,
     pub wallet_young_days: u64,
     pub low_holders_count: u64,
-    
+
     #[cfg(feature = "lp-analysis")]
     pub low_lp_value_usd: f64,
 }
@@ -55,7 +55,7 @@ impl Config {
             _ => anyhow::bail!("Unknown profile: {}", profile),
         }
     }
-    
+
     pub fn conservative() -> Self {
         Self {
             weights: RiskWeights {
@@ -69,7 +69,7 @@ impl Config {
                 mint_revoked: -25,
                 freeze_revoked: -20,
                 supply_distributed: -20,
-                
+
                 #[cfg(feature = "lp-analysis")]
                 no_lp_detected: 25,
                 #[cfg(feature = "lp-analysis")]
@@ -84,13 +84,13 @@ impl Config {
                 supply_distributed_pct: 15.0,
                 wallet_young_days: 14,
                 low_holders_count: 50,
-                
+
                 #[cfg(feature = "lp-analysis")]
                 low_lp_value_usd: 5000.0,
             },
         }
     }
-    
+
     pub fn balanced() -> Self {
         Self {
             weights: RiskWeights {
@@ -104,7 +104,7 @@ impl Config {
                 mint_revoked: -20,
                 freeze_revoked: -15,
                 supply_distributed: -15,
-                
+
                 #[cfg(feature = "lp-analysis")]
                 no_lp_detected: 20,
                 #[cfg(feature = "lp-analysis")]
@@ -119,13 +119,13 @@ impl Config {
                 supply_distributed_pct: 10.0,
                 wallet_young_days: 7,
                 low_holders_count: 30,
-                
+
                 #[cfg(feature = "lp-analysis")]
                 low_lp_value_usd: 2000.0,
             },
         }
     }
-    
+
     pub fn degenerate() -> Self {
         Self {
             weights: RiskWeights {
@@ -139,7 +139,7 @@ impl Config {
                 mint_revoked: -15,
                 freeze_revoked: -10,
                 supply_distributed: -10,
-                
+
                 #[cfg(feature = "lp-analysis")]
                 no_lp_detected: 10,
                 #[cfg(feature = "lp-analysis")]
@@ -154,7 +154,7 @@ impl Config {
                 supply_distributed_pct: 5.0,
                 wallet_young_days: 3,
                 low_holders_count: 10,
-                
+
                 #[cfg(feature = "lp-analysis")]
                 low_lp_value_usd: 500.0,
             },
