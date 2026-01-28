@@ -200,12 +200,13 @@ pub fn print_report(report: &RiskReport, verbose: bool) -> Result<()> {
     let mut summary_text = report.summary.clone();
 
     // Дополняем summary, если holders мало (как в твоём примере)
-    if report.risk_score <= 20 && report.metrics.holders < 50 {
-        if !summary_text.contains("low holder count") {
-            summary_text.push_str(
-                " Main concern: very low holder count — possible early or concentrated project.",
-            );
-        }
+    if report.risk_score <= 20
+        && report.metrics.holders < 50
+        && !summary_text.contains("low holder count")
+    {
+        summary_text.push_str(
+            " Main concern: very low holder count — possible early or concentrated project.",
+        );
     }
 
     println!("  {}", summary_text);
