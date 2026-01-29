@@ -490,6 +490,7 @@ spl-risk <MINT_ADDRESS> --rpc-url "https://mainnet.helius-rpc.com/?api-key=YOUR_
 ### Пример вывода (human)
 
 Важно: это репрезентативный пример текущего форматтера.
+![G_r6uv5WUAAtwLu](https://github.com/user-attachments/assets/cac5e2fe-7609-4b54-8e70-43f0f5ebed30)
 
 ```text
 ═══════════════════════════════════════════════════════════
